@@ -6,39 +6,40 @@
     android:layout_height="match_parent"
     tools:context="com.example.brett.myapplication.MainActivity">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <Button
+        android:id="@+id/speakButton"
+        android:layout_width="88dp"
+        android:layout_height="48dp"
+        android:layout_alignEnd="@+id/textBox"
+        android:layout_alignRight="@+id/textBox"
+        android:layout_below="@+id/textBox"
+        android:layout_marginTop="135dp"
+        android:text="Speak"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <Button
-            android:id="@+id/speakButton"
-            android:layout_width="88dp"
-            android:layout_height="48dp"
-            android:layout_alignEnd="@+id/textBox"
-            android:layout_alignRight="@+id/textBox"
-            android:layout_below="@+id/textBox"
-            android:layout_marginTop="135dp"
-            android:text="Speak"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <EditText
-            android:id="@+id/textBox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="291dp"
-            android:background="@null"
-            android:inputType="textMultiLine"
-            android:selectAllOnFocus="false"
-            android:singleLine="false"
-            android:text="default text"
-            android:textAlignment="center"
-            tools:layout_editor_absoluteX="0dp"
-            tools:layout_editor_absoluteY="0dp" />
-    </RelativeLayout>
+    <EditText
+        android:id="@+id/textBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:background="@null"
+        android:inputType="textMultiLine"
+        android:selectAllOnFocus="false"
+        android:singleLine="false"
+        android:text="default text"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toTopOf="@+id/speakButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.653" />
 
 </android.support.constraint.ConstraintLayout>
