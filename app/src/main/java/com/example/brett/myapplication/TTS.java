@@ -10,13 +10,18 @@ import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
 import java.util.Locale;
 
 /**
  * Created by Brett on 3/27/2018.
  */
 
-public class TTS extends Thread implements TextToSpeech.OnInitListener{
+public class TTS extends Thread implements TextToSpeech.OnInitListener {
     private static final String TAG = "TTS";
 
     private TextToSpeech tts;
@@ -25,20 +30,20 @@ public class TTS extends Thread implements TextToSpeech.OnInitListener{
     public Handler handler;
     private String last;
 
-    TTS(Context con){
+    TTS(Context con) {
         context = con;
         last = "";
         tts = new TextToSpeech(context, this);
     }
 
 
-    public void run(){
+    public void run() {
         Looper.prepare();
-        handler = new Handler(){
-            public void handleMessage(Message msg){
+        handler = new Handler() {
+            public void handleMessage(Message msg) {
 
                 String msgData = msg.getData().getString("TT");
-                Log.d(TAG,msgData);
+                Log.d(TAG, msgData);
                 speak(msgData);
             }
         };
@@ -47,19 +52,19 @@ public class TTS extends Thread implements TextToSpeech.OnInitListener{
     }
 
     public void speak(String words) {
-        if(last != words){
+        if (last != words) {
             last = words;
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 tts.speak(words, TextToSpeech.QUEUE_FLUSH, null, null);
-            }
-            else {
+            } else {
                 tts.speak(words, TextToSpeech.QUEUE_FLUSH, null);
             }
 
-            while (tts.isSpeaking()){
+            while (tts.isSpeaking()) {
                 try {
                     Thread.sleep(200);
-                } catch (Exception e){}
+                } catch (Exception e) {
+                }
             }
         }
     }
@@ -69,9 +74,10 @@ public class TTS extends Thread implements TextToSpeech.OnInitListener{
         if (i == TextToSpeech.SUCCESS) {
             // set language to U.S. English
             tts.setLanguage(Locale.US);
-        }
-        else if (i == TextToSpeech.ERROR) {
+        } else if (i == TextToSpeech.ERROR) {
             Toast.makeText(context, "Text to Speech failed.", Toast.LENGTH_LONG).show();
         }
     }
+
+
 }

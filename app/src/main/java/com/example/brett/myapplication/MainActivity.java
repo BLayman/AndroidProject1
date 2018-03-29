@@ -1,6 +1,8 @@
 
 package com.example.brett.myapplication;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
@@ -12,6 +14,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.content.Intent;
+
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
 import java.util.Locale;
 import android.widget.Toast;
 
@@ -22,7 +30,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private static final String TAG = "MyActivity";
     TTS tts;
+    MyServer server;
     private int MY_DATA_CHECK_CODE = 0; // check user data for TTS
+    public Handler handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +50,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // start above action, passing in check data variable
         startActivityForResult(checkTTSIntent, MY_DATA_CHECK_CODE);
 
+        handleSocketMessages();
+
+
+    }
+
+    private void handleSocketMessages(){
+
+        handler = new Handler(Looper.getMainLooper()) {
+            public void handleMessage(Message msg) {
+                String msgData = msg.getData().getString("started");
+                Log.d(TAG, "received message from MyServer: " + msgData);
+            }
+        };
     }
 
     public void onClick(View v) {
@@ -54,6 +77,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 tts.handler.sendMessage(sendMsg);
                 //Log.d(TAG,speech);
+            case R.id.connect:
+                server = new MyServer(getIpAddress());
+                server.setParent(this);
+                server.start();
         }
     }
 
@@ -74,5 +101,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    public static String getIpAddress() {
+        String ipAddress = "Unable to Fetch IP..";
+        try {
+            Enumeration en;
+            en = NetworkInterface.getNetworkInterfaces();
+            while (en.hasMoreElements()) {
+                NetworkInterface intf = (NetworkInterface) en.nextElement();
+                for (Enumeration enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
+                    InetAddress inetAddress = (InetAddress) enumIpAddr.nextElement();
+                    if (!inetAddress.isLoopbackAddress() && inetAddress instanceof Inet4Address) {
+                        ipAddress = inetAddress.getHostAddress().toString();
+                        return ipAddress;
+                    }
+                }
+            }
+        } catch (SocketException ex) {
+            ex.printStackTrace();
+        }
+        return ipAddress;
+    }
 
 }
