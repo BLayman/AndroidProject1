@@ -1,6 +1,8 @@
 
 package com.example.brett.myapplication;
 
+import android.content.ActivityNotFoundException;
+import android.nfc.Tag;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -12,13 +14,16 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.content.Intent;
+import android.speech.RecognizerIntent;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Locale;
 import android.widget.Toast;
@@ -31,17 +36,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final String TAG = "MyActivity";
     TTS tts;
     MyServer server;
-    private int MY_DATA_CHECK_CODE = 0; // check user data for TTS
+    private static final int MY_DATA_CHECK_CODE = 0; // check user data for TTS
+    private static final int REQ_CODE_SPEECH_INPUT = 1;
     public Handler handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Button button = (Button) findViewById(R.id.speakButton);
-        button.setOnClickListener(this);
+
+        Button speakBtn = (Button) findViewById(R.id.speakButton);
+        speakBtn.setOnClickListener(this);
+
+        Button connectBtn = (Button) findViewById(R.id.connect);
+        connectBtn.setOnClickListener(this);
+
+        ImageButton micBtn = (ImageButton) findViewById(R.id.micBtn);
+        micBtn.setOnClickListener(this);
 
         // create intent for TTS
         Intent checkTTSIntent = new Intent();
@@ -56,7 +67,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void handleSocketMessages(){
-
         handler = new Handler(Looper.getMainLooper()) {
             public void handleMessage(Message msg) {
                 String msgData = msg.getData().getString("started");
@@ -77,26 +87,60 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 tts.handler.sendMessage(sendMsg);
                 //Log.d(TAG,speech);
+                break;
             case R.id.connect:
                 server = new MyServer(getIpAddress());
                 server.setParent(this);
                 server.start();
+                break;
+            case R.id.micBtn:
+                Log.d(TAG,"mic button pressed");
+                startVoiceInput();
+                break;
         }
     }
 
+    private void startVoiceInput() {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Talk to me.");
+        //intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 1000);
+        try {
+            startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
+        } catch (ActivityNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == MY_DATA_CHECK_CODE) {
-            // if user has TTS data, assign TTS object
-            if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
-                Log.d(TAG,"tts found");
-                tts = new TTS(this);
-                tts.start();
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case REQ_CODE_SPEECH_INPUT: {
+                Log.d(TAG,"voice recieved");
+                if (resultCode == RESULT_OK && null != data) {
+                    ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    TextView voiceInputView = (TextView) findViewById(R.id.voiceInput);
+                    voiceInputView.setText(result.get(0));
+                }
+                break;
             }
-            // otherwise ask user to install TTS data
-            else {
-                Intent installTTSIntent = new Intent();
-                installTTSIntent.setAction(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
-                startActivity(installTTSIntent);
+            case MY_DATA_CHECK_CODE:{
+                // if user has TTS data, assign TTS object
+                if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
+                    Log.d(TAG,"tts found");
+                    tts = new TTS(this);
+                    tts.start();
+                }
+                // otherwise ask user to install TTS data
+                else {
+                    Intent installTTSIntent = new Intent();
+                    installTTSIntent.setAction(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
+                    startActivity(installTTSIntent);
+                }
+                break;
             }
         }
     }
@@ -111,7 +155,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 for (Enumeration enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
                     InetAddress inetAddress = (InetAddress) enumIpAddr.nextElement();
                     if (!inetAddress.isLoopbackAddress() && inetAddress instanceof Inet4Address) {
-                        ipAddress = inetAddress.getHostAddress().toString();
+                        ipAddress = inetAddress.getHostAddress();
                         return ipAddress;
                     }
                 }

@@ -64,6 +64,7 @@ public class TTS extends Thread implements TextToSpeech.OnInitListener {
                 try {
                     Thread.sleep(200);
                 } catch (Exception e) {
+                    Log.e(TAG,e.toString());
                 }
             }
         }
