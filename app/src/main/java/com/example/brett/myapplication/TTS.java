@@ -19,6 +19,7 @@ import java.util.Locale;
 
 /**
  * Created by Brett on 3/27/2018.
+ * With help from Johnny
  */
 
 public class TTS extends Thread implements TextToSpeech.OnInitListener {
