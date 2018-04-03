@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private static final String TAG = "MyActivity";
     TTS tts;
-    Client server;
+    Client client;
     private static final int MY_DATA_CHECK_CODE = 0; // check user data for TTS
     private static final int REQ_CODE_SPEECH_INPUT = 1;
     public Handler handler;
@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         handler = new Handler(Looper.getMainLooper()) {
             public void handleMessage(Message msg) {
                 String msgData = msg.getData().getString("started");
-                Log.d(TAG, "received message from Client: " + msgData);
+                Log.d(TAG, "received message from Pi: " + msgData);
             }
         };
     }
@@ -84,9 +84,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //Log.d(TAG,speech);
                 break;
             case R.id.connect:
-                server = new Client(getIpAddress());
-                server.setParent(this);
-                server.start();
+                client = new Client(getIpAddress());
+                client.setParent(this);
+                client.start();
                 break;
             case R.id.micBtn:
                 Log.d(TAG,"mic button pressed");
