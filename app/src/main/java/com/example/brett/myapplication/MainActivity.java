@@ -2,12 +2,10 @@
 package com.example.brett.myapplication;
 
 import android.content.ActivityNotFoundException;
-import android.nfc.Tag;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.speech.tts.TextToSpeech;
-import android.speech.tts.TextToSpeech.OnInitListener;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,16 +24,13 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Locale;
-import android.widget.Toast;
-
-import org.w3c.dom.Text;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "MyActivity";
     TTS tts;
-    MyServer server;
+    Client server;
     private static final int MY_DATA_CHECK_CODE = 0; // check user data for TTS
     private static final int REQ_CODE_SPEECH_INPUT = 1;
     public Handler handler;
@@ -70,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         handler = new Handler(Looper.getMainLooper()) {
             public void handleMessage(Message msg) {
                 String msgData = msg.getData().getString("started");
-                Log.d(TAG, "received message from MyServer: " + msgData);
+                Log.d(TAG, "received message from Client: " + msgData);
             }
         };
     }
@@ -89,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //Log.d(TAG,speech);
                 break;
             case R.id.connect:
-                server = new MyServer(getIpAddress());
+                server = new Client(getIpAddress());
                 server.setParent(this);
                 server.start();
                 break;

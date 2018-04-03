@@ -14,14 +14,14 @@ import java.net.Socket;
  * Created by Brett on 3/28/2018.
  */
 
-public class MyServer extends Thread{
-    static final String TAG = "MyServer";
+public class Client extends Thread{
+    static final String TAG = "Client";
     static final int PORT = 5555;
     public Socket socket;
     private MainActivity parent;
     String ipAddress;
 
-    MyServer(String ipAddress){
+    Client(String ipAddress){
         this.ipAddress = ipAddress;
     }
 
@@ -31,13 +31,13 @@ public class MyServer extends Thread{
 
             try{
                 socket = new Socket(ipAddress,PORT);
-                Log.d(TAG,"server listening");
+                Log.d(TAG,"connected");
                 parent.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         Message msg = parent.handler.obtainMessage();
                         Bundle b = new Bundle();
-                        b.putString("started", "started server");
+                        b.putString("started", "connected");
                         msg.setData(b);
                         parent.handler.sendMessage(msg);
                     }
