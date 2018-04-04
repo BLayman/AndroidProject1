@@ -1,7 +1,6 @@
-package com.example.brett.myapplication;
+package com.example.brett.Robot_Control;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
@@ -10,11 +9,6 @@ import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.widget.Toast;
 
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.util.Enumeration;
 import java.util.Locale;
 
 /**
@@ -42,7 +36,6 @@ public class TTS extends Thread implements TextToSpeech.OnInitListener {
         Looper.prepare();
         handler = new Handler() {
             public void handleMessage(Message msg) {
-
                 String msgData = msg.getData().getString("TT");
                 Log.d(TAG, msgData);
                 speak(msgData);
